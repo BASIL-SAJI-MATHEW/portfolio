@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-theme="dark" class="lite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a12">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="author" content="Basil Saji Mathew">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Basil Saji Mathew: blog" href="/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<title>How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle</title>
+<meta name="description" content="Practical Lua performance tips for FiveM: avoid Wait(0) loops, use distance-based waits, cache natives, use zones and keep database calls off the hot path.">
+<link rel="canonical" href="https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/">
+<meta property="og:site_name" content="Basil Saji Mathew">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle">
+<meta property="og:description" content="Practical Lua performance tips for FiveM: avoid Wait(0) loops, use distance-based waits, cache natives, use zones and keep database calls off the hot path.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/">
+<meta property="og:image" content="https://basilsajimathew.com/assets/og.png">
+<meta property="og:image:alt" content="Basil Saji Mathew, Lua and FiveM developer, backend and security automation">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle">
+<meta name="twitter:description" content="Practical Lua performance tips for FiveM: avoid Wait(0) loops, use distance-based waits, cache natives, use zones and keep database calls off the hot path.">
+<meta name="twitter:image" content="https://basilsajimathew.com/assets/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "headline": "How to Optimize FiveM Lua Scripts and Reach 0.00ms Idle", "description": "Practical Lua performance tips for FiveM: avoid Wait(0) loops, use distance-based waits, cache natives, use zones and keep database calls off the hot path.", "datePublished": "2026-11-27", "dateModified": "2026-11-27", "inLanguage": "en", "mainEntityOfPage": "https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/", "image": "https://basilsajimathew.com/assets/og.png", "author": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "publisher": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "keywords": "FiveM, Lua, Performance, resmon", "wordCount": 574}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://basilsajimathew.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://basilsajimathew.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle", "item": "https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header"><div class="wrap bar">
+  <a class="brand" href="/" aria-label="Basil Saji Mathew, home"><span class="mark">BSM</span><span class="brand-name">Basil Saji Mathew</span></a>
+  <nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/#projects">Projects</a><a href="/blog/" class="active">Blog</a><a href="/#contact">Contact</a></nav>
+  <div class="actions"><a class="btn btn-sm" href="/Basil_Saji_Mathew_CV.pdf" download>Resume</a></div>
+</div></header>
+<main id="main"><article class="wrap article">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / <span>How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle</span></nav>
+<p class="kicker">Guide</p>
+<h1>How to Optimize FiveM Lua Scripts and Reach 0.00ms Idle</h1>
+<p class="post-meta">By <a href="/">Basil Saji Mathew</a> &middot; <time datetime="2026-11-27">27 November 2026</time> &middot; 3 min read</p>
+<ul class="tags sm post-tags"><li>FiveM</li><li>Lua</li><li>Performance</li><li>resmon</li></ul>
+<nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#measure">Measure first with resmon</a></li><li><a href="#wait0">1. Stop using Wait(0) when you do not need it</a></li><li><a href="#dynamic">2. Use a dynamic wait based on distance</a></li><li><a href="#events">3. Prefer events and zones over polling</a></li><li><a href="#cache">4. Cache values you read often</a></li><li><a href="#garbage">5. Avoid creating garbage</a></li><li><a href="#db">6. Keep database calls off the hot path</a></li><li><a href="#split">7. Respect the client and server split</a></li><li><a href="#example">A real example</a></li><li><a href="#faq">Frequently asked questions</a></li></ul></nav>
+<div class="prose-article">
+<p>On a FiveM server, every client script that ticks every frame costs players performance, and the cost adds up across dozens of resources. A well-written resource should sit at <strong>0.00ms when idle</strong> and only use time when something actually happens. These are the habits that get you there.</p>
+
+<h2 id="measure">Measure first with resmon</h2>
+<p>Open the F8 console and run <code>resmon 1</code> to see the CPU time per resource. Anything that shows constant non-zero values while the player is standing still is doing work every frame. Fix the biggest ones first. For deeper analysis, the built-in <code>profiler</code> commands can record where time goes.</p>
+
+<h2 id="wait0">1. Stop using Wait(0) when you do not need it</h2>
+<p>A loop with <code>Wait(0)</code> runs every frame. Most checks do not need that.</p>
+<pre><code>-- Bad: runs every frame, forever
+CreateThread(function()
+    while true do
+        Wait(0)
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        -- check distance to something
+    end
+end)</code></pre>
+
+<h2 id="dynamic">2. Use a dynamic wait based on distance</h2>
+<p>Run fast only when the player is close to the thing you care about, and sleep otherwise.</p>
+<pre><code>-- Better: sleeps long when far away
+CreateThread(function()
+    while true do
+        local sleep = 1000
+        local ped = PlayerPedId()
+        local dist = #(GetEntityCoords(ped) - target)
+        if dist &lt; 20.0 then
+            sleep = 0
+            -- draw marker, handle input
+        elseif dist &lt; 100.0 then
+            sleep = 250
+        end
+        Wait(sleep)
+    end
+end)</code></pre>
+
+<h2 id="events">3. Prefer events and zones over polling</h2>
+<p>If something happens at a location, use a zone or a point instead of checking distance yourself. Libraries such as ox_lib provide zones and points that only run code when the player enters or leaves. Likewise, react to an event, not a loop that asks "did it change yet?".</p>
+
+<h2 id="cache">4. Cache values you read often</h2>
+<p><code>PlayerPedId()</code> and similar natives are cheap but not free when called thousands of times. Read them once per second into a local variable and reuse it. Store frequently used natives in locals instead of looking up globals in a hot loop.</p>
+
+<h2 id="garbage">5. Avoid creating garbage</h2>
+<p>Creating new tables and strings every frame forces the garbage collector to work. Reuse tables where you can and build strings only when the content changes.</p>
+
+<h2 id="db">6. Keep database calls off the hot path</h2>
+<ul>
+<li>Use the async functions in oxmysql so the server thread is not blocked.</li>
+<li>Never query the database on every tick. Load once, keep it in memory, and write back on a timer or on change.</li>
+<li>Add indexes to columns you filter on, such as identifiers and plates.</li>
+<li>Batch writes where possible, and use cooldowns for repeated actions.</li>
+</ul>
+
+<h2 id="split">7. Respect the client and server split</h2>
+<p>Do expensive validation on the server, and keep client scripts for presentation and input. Never trust the client for anything that affects money, items or permissions.</p>
+
+<h2 id="example">A real example</h2>
+<p><a href="https://github.com/BASIL-SAJI-MATHEW/BSM_Weapon_Control">BSM Weapon Control</a> is a weapon disarm resource I wrote for ESX, QBCore, Qbox and standalone servers. It supports radius control, ox_inventory items, safe zones and MySQL cooldowns, and it is built around these ideas so that it idles at 0.00ms.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>What is a good resmon value for a FiveM script?</h3>
+<p>Idle should read 0.00ms. Short spikes during an action are fine; constant 0.05ms or more while standing still usually means a per-frame loop to fix.</p>
+<h3>Is Wait(0) always bad?</h3>
+<p>No. Use it only while you must run every frame, for example drawing a marker or handling a key press near an object, and stop the loop when the player moves away.</p>
+</div>
+<aside class="cta-box"><h2>Need this built or reviewed?</h2><p>I build FiveM Lua resources, backend automation and security monitoring tools, and I work between Bengaluru, India and Abu Dhabi, UAE, or remotely. English and Hindi.</p><a class="btn" href="mailto:hello@basilsajimathew.com?subject=How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle">Email me</a></aside>
+<section class="related"><h2>More guides</h2><ul><li><a href="/blog/block-rdp-brute-force-attacks-windows/">How to Block RDP Brute-Force Attacks on Windows Server</a></li><li><a href="/blog/automate-mysql-backups-fivem-server/">Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</a></li><li><a href="/blog/fail2ban-alternative-windows-rdp-ssh/">Fail2ban for Windows? RDP and SSH Protection Options Compared</a></li></ul></section>
+</article></main>
+<footer class="footer"><div class="wrap foot">
+<span>&copy; 2026 Basil Saji Mathew</span>
+<span><a href="/blog/">Blog</a> &nbsp;/&nbsp; <a href="/feed.xml">RSS</a> &nbsp;/&nbsp; <a href="/sitemap.xml">Sitemap</a> &nbsp;/&nbsp; <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a></span>
+</div></footer>
+</body>
+</html>

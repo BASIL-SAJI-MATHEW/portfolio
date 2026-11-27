@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-theme="dark" class="lite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a12">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="author" content="Basil Saji Mathew">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Basil Saji Mathew: blog" href="/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<title>Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</title>
+<meta name="description" content="A practical guide to automatic MySQL backups for FiveM servers: mysqldump, compression, retention, offsite copies, restore tests and Discord alerts.">
+<link rel="canonical" href="https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/">
+<meta property="og:site_name" content="Basil Saji Mathew">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)">
+<meta property="og:description" content="A practical guide to automatic MySQL backups for FiveM servers: mysqldump, compression, retention, offsite copies, restore tests and Discord alerts.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/">
+<meta property="og:image" content="https://basilsajimathew.com/assets/og.png">
+<meta property="og:image:alt" content="Basil Saji Mathew, Lua and FiveM developer, backend and security automation">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)">
+<meta name="twitter:description" content="A practical guide to automatic MySQL backups for FiveM servers: mysqldump, compression, retention, offsite copies, restore tests and Discord alerts.">
+<meta name="twitter:image" content="https://basilsajimathew.com/assets/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "headline": "How to Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)", "description": "A practical guide to automatic MySQL backups for FiveM servers: mysqldump, compression, retention, offsite copies, restore tests and Discord alerts.", "datePublished": "2026-11-27", "dateModified": "2026-11-27", "inLanguage": "en", "mainEntityOfPage": "https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/", "image": "https://basilsajimathew.com/assets/og.png", "author": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "publisher": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "keywords": "FiveM, MySQL, Backups, ESX, QBCore", "wordCount": 476}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://basilsajimathew.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://basilsajimathew.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)", "item": "https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header"><div class="wrap bar">
+  <a class="brand" href="/" aria-label="Basil Saji Mathew, home"><span class="mark">BSM</span><span class="brand-name">Basil Saji Mathew</span></a>
+  <nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/#projects">Projects</a><a href="/blog/" class="active">Blog</a><a href="/#contact">Contact</a></nav>
+  <div class="actions"><a class="btn btn-sm" href="/Basil_Saji_Mathew_CV.pdf" download>Resume</a></div>
+</div></header>
+<main id="main"><article class="wrap article">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / <span>Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</span></nav>
+<p class="kicker">Guide</p>
+<h1>How to Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</h1>
+<p class="post-meta">By <a href="/">Basil Saji Mathew</a> &middot; <time datetime="2026-11-27">27 November 2026</time> &middot; 2 min read</p>
+<ul class="tags sm post-tags"><li>FiveM</li><li>MySQL</li><li>Backups</li><li>ESX</li><li>QBCore</li></ul>
+<nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#what">What to back up</a></li><li><a href="#dump">Step 1: Dump the database consistently</a></li><li><a href="#schedule">Step 2: Schedule it</a></li><li><a href="#offsite">Step 3: Copy backups off the machine</a></li><li><a href="#alerts">Step 4: Get a Discord alert</a></li><li><a href="#restore">Step 5: Test your restore</a></li><li><a href="#faq">Frequently asked questions</a></li></ul></nav>
+<div class="prose-article">
+<p>Your FiveM database holds everything players care about: characters, money, vehicles, houses and inventories. One bad script update, a corrupted table or a hacked panel can wipe it. Automatic, tested backups are the cheapest insurance a server owner can buy. This guide covers a simple setup that works for ESX, QBCore, Qbox and standalone servers.</p>
+
+<h2 id="what">What to back up</h2>
+<ul>
+<li><strong>The MySQL or MariaDB database</strong> used by oxmysql or mysql-async. This is the critical one.</li>
+<li><strong>Your resources and configuration</strong> (the <code>resources</code> folder, <code>server.cfg</code>, any custom framework configs).</li>
+<li><strong>Uploaded assets</strong> such as custom maps or vehicle streams, if you cannot re-download them.</li>
+</ul>
+
+<h2 id="dump">Step 1: Dump the database consistently</h2>
+<p>Use <code>mysqldump</code> with <code>--single-transaction</code> so InnoDB tables are dumped consistently without locking the server while players are online. Keep credentials out of the command line by putting them in <code>~/.my.cnf</code> and setting its permissions to 600.</p>
+<pre><code>#!/usr/bin/env bash
+set -euo pipefail
+DB="fivem"
+DEST="/var/backups/fivem"
+STAMP=$(date +%F_%H%M)
+mkdir -p "$DEST"
+mysqldump --single-transaction --routines --triggers "$DB" | gzip &gt; "$DEST/$DB-$STAMP.sql.gz"
+# keep 14 days of backups
+find "$DEST" -name "$DB-*.sql.gz" -mtime +14 -delete</code></pre>
+
+<h2 id="schedule">Step 2: Schedule it</h2>
+<p>On Linux, add a cron entry. This runs every six hours:</p>
+<pre><code>0 */6 * * * /opt/backup/fivem-backup.sh</code></pre>
+<p>On Windows, create a Task Scheduler task that runs the script on a repeating trigger. Pick a frequency based on how much play you can afford to lose: a busy roleplay server should back up at least every few hours.</p>
+
+<h2 id="offsite">Step 3: Copy backups off the machine</h2>
+<p>A backup stored on the same disk as the database is not a backup. Copy it to another server over SFTP, or to object storage, and encrypt it before it leaves the machine. The <a href="https://github.com/BASIL-SAJI-MATHEW/Automatic-SFTP-Backup-System">Automatic SFTP Backup System</a> I wrote does multi-server SFTP sync with AES-256 encryption, compression, database dumps and retention cleanup.</p>
+
+<h2 id="alerts">Step 4: Get a Discord alert</h2>
+<p>A backup that fails silently is the most dangerous kind. Post the result to a Discord channel with a webhook:</p>
+<pre><code>curl -H "Content-Type: application/json" \
+  -d '{"content":"FiveM DB backup finished"}' "$DISCORD_WEBHOOK_URL"</code></pre>
+<p>Send a different message on failure so you can spot problems at a glance. My <a href="https://github.com/BASIL-SAJI-MATHEW/fivem-database-backup">FiveM Database Backup</a> tool does MySQL backups for ESX, QBCore, Qbox and standalone servers with gzip compression, retention cleanup and Discord alerts built in.</p>
+
+<h2 id="restore">Step 5: Test your restore</h2>
+<p>Once a month, restore a backup into a test database and start a test server against it. This is the only way to know your backups work.</p>
+<pre><code>gunzip &lt; fivem-2026-11-27_0600.sql.gz | mysql fivem_restore_test</code></pre>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>How often should I back up a FiveM database?</h3>
+<p>For an active server, every 4 to 6 hours is a sensible default. Keep daily copies for two weeks and weekly copies for longer.</p>
+<h3>Will mysqldump lag my server?</h3>
+<p>With <code>--single-transaction</code> it does not lock InnoDB tables, but it still uses disk and CPU. Run it off-peak if your database is large.</p>
+</div>
+<aside class="cta-box"><h2>Need this built or reviewed?</h2><p>I build FiveM Lua resources, backend automation and security monitoring tools, and I work between Bengaluru, India and Abu Dhabi, UAE, or remotely. English and Hindi.</p><a class="btn" href="mailto:hello@basilsajimathew.com?subject=Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)">Email me</a></aside>
+<section class="related"><h2>More guides</h2><ul><li><a href="/blog/block-rdp-brute-force-attacks-windows/">How to Block RDP Brute-Force Attacks on Windows Server</a></li><li><a href="/blog/fail2ban-alternative-windows-rdp-ssh/">Fail2ban for Windows? RDP and SSH Protection Options Compared</a></li><li><a href="/blog/optimize-fivem-lua-scripts-low-resmon/">How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle</a></li></ul></section>
+</article></main>
+<footer class="footer"><div class="wrap foot">
+<span>&copy; 2026 Basil Saji Mathew</span>
+<span><a href="/blog/">Blog</a> &nbsp;/&nbsp; <a href="/feed.xml">RSS</a> &nbsp;/&nbsp; <a href="/sitemap.xml">Sitemap</a> &nbsp;/&nbsp; <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a></span>
+</div></footer>
+</body>
+</html>

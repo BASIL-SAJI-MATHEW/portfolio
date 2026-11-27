@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-theme="dark" class="lite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a12">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="author" content="Basil Saji Mathew">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Basil Saji Mathew: blog" href="/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<title>How to Block RDP Brute-Force Attacks on Windows Server</title>
+<meta name="description" content="Practical steps to detect and stop RDP password-guessing attacks on Windows: Event ID 4625, account lockout, NLA, firewall rules and automated blocking.">
+<link rel="canonical" href="https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/">
+<meta property="og:site_name" content="Basil Saji Mathew">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="How to Block RDP Brute-Force Attacks on Windows Server">
+<meta property="og:description" content="Practical steps to detect and stop RDP password-guessing attacks on Windows: Event ID 4625, account lockout, NLA, firewall rules and automated blocking.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/">
+<meta property="og:image" content="https://basilsajimathew.com/assets/og.png">
+<meta property="og:image:alt" content="Basil Saji Mathew, Lua and FiveM developer, backend and security automation">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Block RDP Brute-Force Attacks on Windows Server">
+<meta name="twitter:description" content="Practical steps to detect and stop RDP password-guessing attacks on Windows: Event ID 4625, account lockout, NLA, firewall rules and automated blocking.">
+<meta name="twitter:image" content="https://basilsajimathew.com/assets/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "headline": "How to Block RDP Brute-Force Attacks on Windows Server (Step by Step)", "description": "Practical steps to detect and stop RDP password-guessing attacks on Windows: Event ID 4625, account lockout, NLA, firewall rules and automated blocking.", "datePublished": "2026-11-27", "dateModified": "2026-11-27", "inLanguage": "en", "mainEntityOfPage": "https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/", "image": "https://basilsajimathew.com/assets/og.png", "author": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "publisher": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "keywords": "RDP, Windows Server, Security, Brute force", "wordCount": 660}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://basilsajimathew.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://basilsajimathew.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "How to Block RDP Brute-Force Attacks on Windows Server", "item": "https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header"><div class="wrap bar">
+  <a class="brand" href="/" aria-label="Basil Saji Mathew, home"><span class="mark">BSM</span><span class="brand-name">Basil Saji Mathew</span></a>
+  <nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/#projects">Projects</a><a href="/blog/" class="active">Blog</a><a href="/#contact">Contact</a></nav>
+  <div class="actions"><a class="btn btn-sm" href="/Basil_Saji_Mathew_CV.pdf" download>Resume</a></div>
+</div></header>
+<main id="main"><article class="wrap article">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / <span>How to Block RDP Brute-Force Attacks on Windows Server</span></nav>
+<p class="kicker">Guide</p>
+<h1>How to Block RDP Brute-Force Attacks on Windows Server (Step by Step)</h1>
+<p class="post-meta">By <a href="/">Basil Saji Mathew</a> &middot; <time datetime="2026-11-27">27 November 2026</time> &middot; 3 min read</p>
+<ul class="tags sm post-tags"><li>RDP</li><li>Windows Server</li><li>Security</li><li>Brute force</li></ul>
+<nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#confirm">Step 1: Confirm you are being attacked</a></li><li><a href="#exposure">Step 2: Reduce your exposure first</a></li><li><a href="#lockout">Step 3: Set an account lockout policy</a></li><li><a href="#block">Step 4: Block repeat offenders automatically</a></li><li><a href="#alerts">Step 5: Get alerted</a></li><li><a href="#faq">Frequently asked questions</a></li></ul></nav>
+<div class="prose-article">
+<p>Any Windows server with Remote Desktop (RDP, port 3389) open to the internet is found by scanners within minutes, and then it is hit with automated password guesses all day. This guide shows how to confirm the attack, shrink your exposure, and block the attackers automatically, using only what ships with Windows plus a little scripting.</p>
+
+<h2 id="confirm">Step 1: Confirm you are being attacked</h2>
+<p>Every failed logon is written to the Security log as <strong>Event ID 4625</strong>. Open Event Viewer, go to Windows Logs, then Security, and filter for 4625. A burst of failures from the same address in a short window is a brute-force attempt. This PowerShell command lists the ten addresses with the most failures in the last hour:</p>
+<pre><code>Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4625; StartTime=(Get-Date).AddHours(-1)} |
+  ForEach-Object { $_.Properties[19].Value } |
+  Group-Object | Sort-Object Count -Descending |
+  Select-Object -First 10 Count, Name</code></pre>
+<p>Run it as Administrator. If you see hundreds of attempts from a handful of addresses, keep reading.</p>
+
+<h2 id="exposure">Step 2: Reduce your exposure first</h2>
+<p>Blocking attackers is a second line of defence. The best protection is not exposing RDP at all:</p>
+<ul>
+<li><strong>Put RDP behind a VPN or an RD Gateway</strong> so port 3389 is never reachable from the internet.</li>
+<li><strong>Restrict by source address</strong> in Windows Defender Firewall: edit the inbound Remote Desktop rule and set the scope to only your office or home IP addresses.</li>
+<li><strong>Do not rely on changing the port.</strong> Scanners find non-standard ports too. It reduces noise, but it is not security.</li>
+<li><strong>Require Network Level Authentication (NLA)</strong> so the server authenticates users before it opens a full session.</li>
+</ul>
+
+<h2 id="lockout">Step 3: Set an account lockout policy</h2>
+<p>Open <code>secpol.msc</code>, then Account Policies, then Account Lockout Policy. A threshold of 5 to 10 invalid attempts with a 15 minute lockout slows guessing a lot. One caution: lockouts can be abused to lock real users out, so pair the policy with source-address blocking rather than relying on it alone.</p>
+
+<h2 id="block">Step 4: Block repeat offenders automatically</h2>
+<p>The pattern is simple: count failures per address in a sliding time window, and when an address crosses a threshold, add a firewall rule that blocks it. A single block looks like this:</p>
+<pre><code>netsh advfirewall firewall add rule name="Block 203.0.113.50" dir=in action=block remoteip=203.0.113.50</code></pre>
+<p>Doing this by hand does not scale, so automate it. Whatever you use, follow these rules so you never lock yourself out:</p>
+<ul>
+<li><strong>Allowlist your own addresses</strong> before anything can block them.</li>
+<li><strong>Start in observe mode.</strong> Log what would have been blocked for a day or two, check the list, then switch on blocking.</li>
+<li><strong>Expire bans.</strong> A ban that lasts hours or days is usually enough, and it keeps the firewall rule list short.</li>
+<li><strong>Keep an audit log</strong> of every block and why.</li>
+</ul>
+<p>I built <a href="https://github.com/BASIL-SAJI-MATHEW/portcullis">Portcullis</a>, an open-source tool that does this for Windows RDP and Linux SSH. It starts in observe mode, has a web dashboard, and sends alerts to Discord, Telegram or Slack. Its README says plainly what is and is not tested. If you only want detection and alerts, <a href="https://github.com/BASIL-SAJI-MATHEW/Rdp-Login-Monitor">RDP Login Monitor</a> parses the Windows Security log in real time and posts suspicious logins to Discord.</p>
+
+<h2 id="alerts">Step 5: Get alerted</h2>
+<p>Blocking silently is risky: you will not know when a real user is caught or when an attack succeeds. Send an alert on every block, and a louder one if a successful logon (Event ID 4624) follows a run of failures from the same address. That pattern means a guess worked.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>Is it safe to leave RDP open to the internet?</h3>
+<p>Not without protection. Use a VPN or RD Gateway if you can. If you must expose RDP, restrict source addresses, enable NLA, set a lockout policy, use strong unique passwords and block repeat offenders.</p>
+<h3>Does changing the RDP port stop brute-force attacks?</h3>
+<p>No. It lowers noise from basic scanners but determined attackers scan every port.</p>
+<h3>Which event ID shows failed RDP logins?</h3>
+<p>Event ID 4625 in the Security log. Successful logons are 4624.</p>
+</div>
+<aside class="cta-box"><h2>Need this built or reviewed?</h2><p>I build FiveM Lua resources, backend automation and security monitoring tools, and I work between Bengaluru, India and Abu Dhabi, UAE, or remotely. English and Hindi.</p><a class="btn" href="mailto:hello@basilsajimathew.com?subject=How to Block RDP Brute-Force Attacks on Windows Server">Email me</a></aside>
+<section class="related"><h2>More guides</h2><ul><li><a href="/blog/automate-mysql-backups-fivem-server/">Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</a></li><li><a href="/blog/fail2ban-alternative-windows-rdp-ssh/">Fail2ban for Windows? RDP and SSH Protection Options Compared</a></li><li><a href="/blog/optimize-fivem-lua-scripts-low-resmon/">How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle</a></li></ul></section>
+</article></main>
+<footer class="footer"><div class="wrap foot">
+<span>&copy; 2026 Basil Saji Mathew</span>
+<span><a href="/blog/">Blog</a> &nbsp;/&nbsp; <a href="/feed.xml">RSS</a> &nbsp;/&nbsp; <a href="/sitemap.xml">Sitemap</a> &nbsp;/&nbsp; <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a></span>
+</div></footer>
+</body>
+</html>

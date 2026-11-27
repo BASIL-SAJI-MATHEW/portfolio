@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-theme="dark" class="lite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a12">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="author" content="Basil Saji Mathew">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Basil Saji Mathew: blog" href="/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<title>Fail2ban for Windows? RDP and SSH Protection Options Compared</title>
+<meta name="description" content="Fail2ban only runs on Linux. Here is how to get the same brute-force protection for Windows RDP and Linux SSH, with the trade-offs of each approach.">
+<link rel="canonical" href="https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/">
+<meta property="og:site_name" content="Basil Saji Mathew">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Fail2ban for Windows? RDP and SSH Protection Options Compared">
+<meta property="og:description" content="Fail2ban only runs on Linux. Here is how to get the same brute-force protection for Windows RDP and Linux SSH, with the trade-offs of each approach.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/">
+<meta property="og:image" content="https://basilsajimathew.com/assets/og.png">
+<meta property="og:image:alt" content="Basil Saji Mathew, Lua and FiveM developer, backend and security automation">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fail2ban for Windows? RDP and SSH Protection Options Compared">
+<meta name="twitter:description" content="Fail2ban only runs on Linux. Here is how to get the same brute-force protection for Windows RDP and Linux SSH, with the trade-offs of each approach.">
+<meta name="twitter:image" content="https://basilsajimathew.com/assets/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BlogPosting", "headline": "Fail2ban for Windows? RDP and SSH Protection Options Compared", "description": "Fail2ban only runs on Linux. Here is how to get the same brute-force protection for Windows RDP and Linux SSH, with the trade-offs of each approach.", "datePublished": "2026-11-27", "dateModified": "2026-11-27", "inLanguage": "en", "mainEntityOfPage": "https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/", "image": "https://basilsajimathew.com/assets/og.png", "author": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "publisher": {"@type": "Person", "@id": "https://basilsajimathew.com/#person", "name": "Basil Saji Mathew", "url": "https://basilsajimathew.com/"}, "keywords": "Fail2ban, RDP, SSH, Windows, Linux", "wordCount": 404}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://basilsajimathew.com/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://basilsajimathew.com/blog/"}, {"@type": "ListItem", "position": 3, "name": "Fail2ban for Windows? RDP and SSH Protection Options Compared", "item": "https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header"><div class="wrap bar">
+  <a class="brand" href="/" aria-label="Basil Saji Mathew, home"><span class="mark">BSM</span><span class="brand-name">Basil Saji Mathew</span></a>
+  <nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/#projects">Projects</a><a href="/blog/" class="active">Blog</a><a href="/#contact">Contact</a></nav>
+  <div class="actions"><a class="btn btn-sm" href="/Basil_Saji_Mathew_CV.pdf" download>Resume</a></div>
+</div></header>
+<main id="main"><article class="wrap article">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / <span>Fail2ban for Windows? RDP and SSH Protection Options Compared</span></nav>
+<p class="kicker">Guide</p>
+<h1>Fail2ban for Windows? RDP and SSH Protection Options Compared</h1>
+<p class="post-meta">By <a href="/">Basil Saji Mathew</a> &middot; <time datetime="2026-11-27">27 November 2026</time> &middot; 2 min read</p>
+<ul class="tags sm post-tags"><li>Fail2ban</li><li>RDP</li><li>SSH</li><li>Windows</li><li>Linux</li></ul>
+<nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#how">How fail2ban-style protection works</a></li><li><a href="#options">Your options</a></li><li><a href="#portcullis">Where Portcullis fits</a></li><li><a href="#advice">Whichever you choose</a></li><li><a href="#faq">Frequently asked questions</a></li></ul></nav>
+<div class="prose-article">
+<p>Fail2ban is the classic way to stop password-guessing attacks on Linux: it reads log files, counts failures per address, and bans offenders with the firewall. It does not run on Windows, which is where a lot of exposed RDP servers live. If you want fail2ban-style protection for both Windows RDP and Linux SSH, here are your options.</p>
+
+<h2 id="how">How fail2ban-style protection works</h2>
+<ol>
+<li><strong>Read</strong> authentication failures from a log (on Windows, Security Event ID 4625; on Linux, the SSH auth log).</li>
+<li><strong>Count</strong> failures per source address inside a sliding time window.</li>
+<li><strong>Ban</strong> an address that crosses a threshold by adding a firewall rule.</li>
+<li><strong>Unban</strong> after a set time so mistakes are temporary.</li>
+</ol>
+
+<h2 id="options">Your options</h2>
+<table>
+<thead><tr><th>Approach</th><th>Works on</th><th>Best for</th><th>Trade-off</th></tr></thead>
+<tbody>
+<tr><td>Fail2ban</td><td>Linux</td><td>SSH and other Linux services</td><td>Not available for Windows</td></tr>
+<tr><td>VPN or RD Gateway</td><td>Windows</td><td>Removing the exposure entirely</td><td>Needs setup; not a ban tool</td></tr>
+<tr><td>Scheduled script on Event 4625</td><td>Windows</td><td>Small servers, full control</td><td>You maintain the code and edge cases</td></tr>
+<tr><td>Open-source tools such as IPBan or EvlWatcher</td><td>Windows</td><td>Ready-made banning for Windows logs</td><td>Windows-focused; separate tool for Linux</td></tr>
+<tr><td>Portcullis</td><td>Windows and Linux</td><td>One tool and dashboard for RDP and SSH</td><td>Young project; read its README for what is tested</td></tr>
+</tbody></table>
+
+<h2 id="portcullis">Where Portcullis fits</h2>
+<p>I built <a href="https://github.com/BASIL-SAJI-MATHEW/portcullis">Portcullis</a> because I wanted one small tool for both operating systems. It uses a sliding-window detector, blocks with <code>netsh</code> on Windows and <code>iptables</code> on Linux, shows everything in a web dashboard, and alerts through Discord, Telegram or Slack. It starts in <strong>observe mode</strong>, so it logs what it would block without touching your firewall until you are ready. It is written with the Python standard library only, so there are no dependencies to install or audit. It is open source under the MIT licence, with 118 automated tests.</p>
+
+<h2 id="advice">Whichever you choose</h2>
+<ul>
+<li><strong>Allowlist yourself first.</strong> The worst outcome of a ban tool is locking out the administrator.</li>
+<li><strong>Run it in observe mode</strong> for a day before you enforce bans.</li>
+<li><strong>Expire bans</strong> and keep an audit log.</li>
+<li><strong>Do not rely on it alone.</strong> Use a VPN or gateway, strong passwords, NLA on RDP and key-only authentication on SSH.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<h3>Can I install fail2ban on Windows?</h3>
+<p>Not natively. Fail2ban is a Linux tool. On Windows use an equivalent such as the options in the table above.</p>
+<h3>Is banning IP addresses enough?</h3>
+<p>No. Attackers rotate addresses. Banning reduces noise and slows guessing, but exposure reduction and strong authentication matter more.</p>
+</div>
+<aside class="cta-box"><h2>Need this built or reviewed?</h2><p>I build FiveM Lua resources, backend automation and security monitoring tools, and I work between Bengaluru, India and Abu Dhabi, UAE, or remotely. English and Hindi.</p><a class="btn" href="mailto:hello@basilsajimathew.com?subject=Fail2ban for Windows? RDP and SSH Protection Options Compared">Email me</a></aside>
+<section class="related"><h2>More guides</h2><ul><li><a href="/blog/block-rdp-brute-force-attacks-windows/">How to Block RDP Brute-Force Attacks on Windows Server</a></li><li><a href="/blog/automate-mysql-backups-fivem-server/">Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</a></li><li><a href="/blog/optimize-fivem-lua-scripts-low-resmon/">How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle</a></li></ul></section>
+</article></main>
+<footer class="footer"><div class="wrap foot">
+<span>&copy; 2026 Basil Saji Mathew</span>
+<span><a href="/blog/">Blog</a> &nbsp;/&nbsp; <a href="/feed.xml">RSS</a> &nbsp;/&nbsp; <a href="/sitemap.xml">Sitemap</a> &nbsp;/&nbsp; <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a></span>
+</div></footer>
+</body>
+</html>

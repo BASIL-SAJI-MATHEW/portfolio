@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>Basil Saji Mathew: guides on FiveM, Lua and server security</title>
+<link>https://basilsajimathew.com/blog/</link>
+<description>Guides on FiveM Lua, backups and server security.</description>
+<language>en</language>
+<item><title>How to Block RDP Brute-Force Attacks on Windows Server</title><link>https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/</link><guid>https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/</guid><pubDate>Fri, 27 Nov 2026 06:00:00 GMT</pubDate><description>Practical steps to detect and stop RDP password-guessing attacks on Windows: Event ID 4625, account lockout, NLA, firewall rules and automated blocking.</description></item>
+<item><title>Automate MySQL Backups for a FiveM Server (ESX, QBCore, Qbox)</title><link>https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/</link><guid>https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/</guid><pubDate>Fri, 27 Nov 2026 06:00:00 GMT</pubDate><description>A practical guide to automatic MySQL backups for FiveM servers: mysqldump, compression, retention, offsite copies, restore tests and Discord alerts.</description></item>
+<item><title>Fail2ban for Windows? RDP and SSH Protection Options Compared</title><link>https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/</link><guid>https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/</guid><pubDate>Fri, 27 Nov 2026 06:00:00 GMT</pubDate><description>Fail2ban only runs on Linux. Here is how to get the same brute-force protection for Windows RDP and Linux SSH, with the trade-offs of each approach.</description></item>
+<item><title>How to Optimize FiveM Lua Scripts: Reaching 0.00ms Idle</title><link>https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/</link><guid>https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/</guid><pubDate>Fri, 27 Nov 2026 06:00:00 GMT</pubDate><description>Practical Lua performance tips for FiveM: avoid Wait(0) loops, use distance-based waits, cache natives, use zones and keep database calls off the hot path.</description></item>
+</channel></rss>
