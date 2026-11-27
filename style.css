@@ -251,3 +251,10 @@ h2.decode,.kicker.decode{font-variant-ligatures:none}
 .blog-cards h2 a{color:var(--text);text-decoration:none}
 .blog-cards h2 a:hover{color:var(--accent2)}
 @media (max-width:680px){.grid2,.blog-cards{grid-template-columns:1fr}.article{padding-top:36px}}
+
+.footcols{align-items:flex-start}
+.footcols span:last-child{max-width:62ch;line-height:1.9}
+.svc-projects{margin:18px 0 8px}
+.svc-projects .card h3{font-size:1.05rem}
+.panel h4 a{color:var(--text);text-decoration:none}
+.panel h4 a:hover{color:var(--accent2)}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" data-theme="dark" class="lite">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070a12">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="author" content="Basil Saji Mathew">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Basil Saji Mathew: blog" href="/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<title>RDP and SSH Brute-Force Protection | Basil Saji Mathew</title>
+<meta name="description" content="Security automation by Basil Saji Mathew: detect and block brute-force attacks on Windows RDP and Linux SSH, with alerts. Bengaluru and Abu Dhabi.">
+<link rel="canonical" href="https://basilsajimathew.com/security-automation/">
+<meta property="og:site_name" content="Basil Saji Mathew">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="RDP and SSH Brute-Force Protection | Basil Saji Mathew">
+<meta property="og:description" content="Security automation by Basil Saji Mathew: detect and block brute-force attacks on Windows RDP and Linux SSH, with alerts. Bengaluru and Abu Dhabi.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://basilsajimathew.com/security-automation/">
+<meta property="og:image" content="https://basilsajimathew.com/assets/og.png">
+<meta property="og:image:alt" content="Basil Saji Mathew, Lua and FiveM developer, backend and security automation">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RDP and SSH Brute-Force Protection | Basil Saji Mathew">
+<meta name="twitter:description" content="Security automation by Basil Saji Mathew: detect and block brute-force attacks on Windows RDP and Linux SSH, with alerts. Bengaluru and Abu Dhabi.">
+<meta name="twitter:image" content="https://basilsajimathew.com/assets/og.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "@id": "https://basilsajimathew.com/security-automation/#webpage", "url": "https://basilsajimathew.com/security-automation/", "name": "RDP and SSH Brute-Force Protection | Basil Saji Mathew", "description": "Security automation by Basil Saji Mathew: detect and block brute-force attacks on Windows RDP and Linux SSH, with alerts. Bengaluru and Abu Dhabi.", "inLanguage": "en", "isPartOf": {"@id": "https://basilsajimathew.com/#website"}, "about": {"@id": "https://basilsajimathew.com/#person"}, "dateModified": "2026-11-27"}, {"@type": "Service", "name": "Security automation and brute-force protection", "description": "Detection, blocking and alerting for brute-force attacks on Windows RDP and Linux SSH.", "provider": {"@id": "https://basilsajimathew.com/#person"}, "areaServed": [{"@type": "City", "name": "Bengaluru"}, {"@type": "City", "name": "Abu Dhabi"}, {"@type": "Country", "name": "India"}, {"@type": "Country", "name": "United Arab Emirates"}], "availableLanguage": ["English", "Hindi"], "url": "https://basilsajimathew.com/security-automation/"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I stop RDP brute-force attacks?", "acceptedAnswer": {"@type": "Answer", "text": "Put RDP behind a VPN or RD Gateway, restrict source addresses, require NLA, set an account lockout policy and automatically block repeat offenders. See my step-by-step guide."}}, {"@type": "Question", "name": "Is there a fail2ban for Windows?", "acceptedAnswer": {"@type": "Answer", "text": "Fail2ban is Linux only. For Windows and Linux together you can use Portcullis, an open-source tool I built, or other Windows-focused tools."}}, {"@type": "Question", "name": "Do you work in the UAE?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. I work between Bengaluru, India and Abu Dhabi, UAE, and remotely."}}, {"@type": "Question", "name": "How do I get help setting this up?", "acceptedAnswer": {"@type": "Answer", "text": "Email hello@basilsajimathew.com with your operating system and how your server is exposed."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://basilsajimathew.com/"}, {"@type": "ListItem", "position": 2, "name": "Security automation", "item": "https://basilsajimathew.com/security-automation/"}]}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header"><div class="wrap bar">
+  <a class="brand" href="/" aria-label="Basil Saji Mathew, home"><span class="mark">BSM</span><span class="brand-name">Basil Saji Mathew</span></a>
+  <nav class="nav" aria-label="Primary"><a href="/">Home</a><a href="/about/">About</a><a href="/#projects">Projects</a><a href="/blog/">Blog</a><a href="/#contact">Contact</a></nav>
+  <div class="actions"><a class="btn btn-sm" href="/Basil_Saji_Mathew_CV.pdf" download>Resume</a></div>
+</div></header>
+<main id="main"><div class="wrap article">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <span>Security automation</span></nav>
+<p class="kicker">Security automation</p>
+<h1>Security Automation: Stop Brute-Force Attacks on RDP and SSH</h1>
+<nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#offer">What I offer</a></li><li><a href="#tools">Tools I have built</a></li><li><a href="#guides">Free guides</a></li><li><a href="#principles">Principles</a></li><li><a href="#faq">Frequently asked questions</a></li></ul></nav>
+<div class="prose-article"><p>Any server with RDP or SSH open to the internet is attacked by password-guessing bots within minutes. I am <strong>Basil Saji Mathew</strong>, and I build the monitoring and automation that detects those attacks, blocks the sources and tells you what happened.</p>
+<h2 id="offer">What I offer</h2>
+<ul>
+<li><strong>Brute-force protection</strong> for Windows RDP and Linux SSH: detection, blocking and expiry, with an observe mode first.</li>
+<li><strong>Log monitoring and alerts</strong> from Windows Security Event Logs, with Discord, Telegram or Slack notifications.</li>
+<li><strong>Firewall automation</strong> including time-based allow rules and role-based access.</li>
+<li><strong>Hardening advice</strong> such as NLA, VPN or RD Gateway, lockout policy and key-only SSH.</li>
+<li><strong>Backups and recovery</strong> so an incident does not become a disaster.</li>
+</ul>
+<h2 id="tools">Tools I have built</h2><div class="cards svc-projects"><article class="card"><h3>Portcullis</h3><p>Open-source shield that blocks brute-force logins on Windows RDP and Linux SSH, with a web dashboard and Discord, Telegram and Slack alerts.</p><a class="link" href="https://github.com/BASIL-SAJI-MATHEW/portcullis" rel="noopener">View on GitHub</a></article><article class="card"><h3>RDP Login Monitor</h3><p>Parses Windows Security Event Logs in real time to flag brute-force and suspicious Remote Desktop logins, with Discord alerts.</p><a class="link" href="https://github.com/BASIL-SAJI-MATHEW/Rdp-Login-Monitor" rel="noopener">View on GitHub</a></article><article class="card"><h3>IP Whitelist Automation</h3><p>Event-driven IP whitelisting API with role-based access control, an async job queue and time-based firewall rules.</p><a class="link" href="https://github.com/BASIL-SAJI-MATHEW/IP-Whitelist-Automation" rel="noopener">View on GitHub</a></article></div>
+<h2 id="guides">Free guides</h2>
+<ul>
+<li><a href="/blog/block-rdp-brute-force-attacks-windows/">How to block RDP brute-force attacks on Windows Server</a></li>
+<li><a href="/blog/fail2ban-alternative-windows-rdp-ssh/">Fail2ban for Windows? RDP and SSH protection options compared</a></li>
+</ul>
+<h2 id="principles">Principles</h2>
+<p>Allowlist first, observe before you block, expire bans, keep an audit log, and never rely on one control alone. My tools say plainly what is and is not tested.</p><h2 id="faq">Frequently asked questions</h2><h3>How do I stop RDP brute-force attacks?</h3><p>Put RDP behind a VPN or RD Gateway, restrict source addresses, require NLA, set an account lockout policy and automatically block repeat offenders. See my <a href="/blog/block-rdp-brute-force-attacks-windows/">step-by-step guide</a>.</p><h3>Is there a fail2ban for Windows?</h3><p>Fail2ban is Linux only. For Windows and Linux together you can use Portcullis, an open-source tool I built, or other Windows-focused tools.</p><h3>Do you work in the UAE?</h3><p>Yes. I work between Bengaluru, India and Abu Dhabi, UAE, and remotely.</p><h3>How do I get help setting this up?</h3><p>Email <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a> with your operating system and how your server is exposed.</p></div>
+<aside class="cta-box"><h2>Let us talk about your project</h2><p>Email <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a>. I work between Bengaluru, India and Abu Dhabi, UAE, and remotely. English and Hindi.</p><a class="btn" href="mailto:hello@basilsajimathew.com">Email Basil</a></aside>
+<section class="related"><h2>Explore more</h2><ul><li><a href="/about/">About Basil Saji Mathew</a></li><li><a href="/lua-developer/">Lua developer</a></li><li><a href="/fivem-developer/">FiveM developer</a></li><li><a href="/backend-developer/">Backend developer</a></li><li><a href="/blog/">Guides and blog</a></li></ul></section>
+</div></main>
+<footer class="footer"><div class="wrap foot footcols">
+<span>&copy; 2026 Basil Saji Mathew &middot; Lua and FiveM developer, Bengaluru, India and Abu Dhabi, UAE</span>
+<span><a href="/about/">About</a> &nbsp;/&nbsp; <a href="/lua-developer/">Lua developer</a> &nbsp;/&nbsp; <a href="/fivem-developer/">FiveM developer</a> &nbsp;/&nbsp; <a href="/backend-developer/">Backend developer</a> &nbsp;/&nbsp; <a href="/security-automation/">Security automation</a> &nbsp;/&nbsp; <a href="/blog/">Blog</a> &nbsp;/&nbsp; <a href="/feed.xml">RSS</a> &nbsp;/&nbsp; <a href="/sitemap.xml">Sitemap</a> &nbsp;/&nbsp; <a href="mailto:hello@basilsajimathew.com">hello@basilsajimathew.com</a></span>
+</div></footer>
+</body>
+</html>

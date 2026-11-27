@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://basilsajimathew.com/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://basilsajimathew.com/about/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://basilsajimathew.com/lua-developer/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://basilsajimathew.com/fivem-developer/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://basilsajimathew.com/backend-developer/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://basilsajimathew.com/security-automation/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://basilsajimathew.com/blog/</loc><lastmod>2026-11-27</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://basilsajimathew.com/blog/automate-mysql-backups-fivem-server/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://basilsajimathew.com/blog/block-rdp-brute-force-attacks-windows/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://basilsajimathew.com/blog/fail2ban-alternative-windows-rdp-ssh/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://basilsajimathew.com/blog/optimize-fivem-lua-scripts-low-resmon/</loc><lastmod>2026-11-27</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
