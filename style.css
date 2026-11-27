@@ -175,3 +175,36 @@ h1{background:linear-gradient(100deg,#fff 30%,#9fd0ff 70%,var(--accent2));-webki
 .lite #bg{display:none}
 .lite body{background:radial-gradient(900px 500px at 85% 10%,rgba(59,130,246,.22),transparent 60%),radial-gradient(700px 500px at 5% 60%,rgba(34,211,238,.12),transparent 60%),#070a12;background-attachment:fixed}
 .lite .hero::before{display:none}
+
+/* ===== futuristic layer: HUD, scanlines, terminal, tech corners ===== */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.fx-scan{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.028) 0,rgba(255,255,255,.028) 1px,transparent 1px,transparent 3px)}
+.fx-vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(3,5,10,.65) 100%)}
+.hud{position:fixed;inset:0;z-index:4;pointer-events:none;font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;color:rgba(130,200,255,.65);text-transform:uppercase}
+.hud-tl{position:absolute;left:22px;top:78px}
+.hud-bl{position:absolute;left:22px;bottom:22px;display:flex;flex-direction:column;gap:6px}
+.hud-br{position:absolute;right:22px;bottom:22px}
+.hud-bl #hud-pct{color:var(--accent2);font-size:1.1rem;letter-spacing:.1em}
+.hud::before,.hud::after{content:"";position:absolute;width:26px;height:26px;border:1px solid rgba(90,162,255,.45)}
+.hud::before{left:10px;top:70px;border-right:0;border-bottom:0}
+.hud::after{right:10px;bottom:10px;border-left:0;border-top:0}
+@media (max-width:980px){.hud{display:none}}
+.term{margin-top:22px;font-family:var(--mono);font-size:.85rem;color:var(--accent2);min-height:1.5em}
+.term .prompt{color:var(--accent)}
+.caret{display:inline-block;width:8px;height:1em;margin-left:3px;vertical-align:-2px;background:var(--accent2);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.card,.panel,.prose,.facts{position:relative}
+.card::before,.panel::before,.prose::before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
+  background:
+   linear-gradient(var(--accent2),var(--accent2)) left top/14px 1px no-repeat,linear-gradient(var(--accent2),var(--accent2)) left top/1px 14px no-repeat,
+   linear-gradient(var(--accent2),var(--accent2)) right bottom/14px 1px no-repeat,linear-gradient(var(--accent2),var(--accent2)) right bottom/1px 14px no-repeat;opacity:.7}
+.card:hover::before{opacity:1}
+h2.decode,.kicker.decode{font-variant-ligatures:none}
+.hero-inner>*:nth-child(6){animation-delay:.4s}
+.btn{position:relative;overflow:hidden}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s}
+.btn:hover::after{transform:translateX(120%)}
+.lite .fx-scan,.lite .fx-vignette{opacity:.3}
+@media (prefers-reduced-motion:reduce){.caret{animation:none}.fx-scan{display:none}}
